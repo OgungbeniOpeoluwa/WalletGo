@@ -14,6 +14,7 @@ type WalletService interface {
 	CreateAccount(req request.CreateAccountRequest) (string, error)
 	InitializeTransaction(req request.FundWalletRequest) (*response.FundWalletResponse, error)
 	GetAllTransactions(accountNumber string) ([]*response.TransactionResponse, error)
+	GetBalance(accountNumber string) (*float64, error)
 }
 
 type WalletServiceImpl struct {
@@ -45,6 +46,7 @@ func (receiver *WalletServiceImpl) CreateAccount(req request.CreateAccountReques
 	account := models.Wallet{
 		AccountNumber: user.PhoneNumber,
 		UserId:        users.ID,
+		Password:      req.Password,
 	}
 	save, err := receiver.repository.Save(account)
 	if err != nil {
@@ -94,6 +96,16 @@ func (receiver *WalletServiceImpl) GetAllTransactions(s string) ([]*response.Tra
 	}
 	transactionResponse := mapTransactionResponse(transactions)
 	return transactionResponse, nil
+}
+
+func (receiver *WalletServiceImpl) GetBalance(s string) (*float64, error) {
+	account, err := receiver.repository.GetBy("account_number", s)
+	if err != nil {
+		err = fmt.Errorf("wallet %v", util.ErrFetching)
+		return nil, err
+	}
+	return &account.Balance, err
+
 }
 
 func mapTransactionResponse(transactions *[]models.Transaction) []*response.TransactionResponse {

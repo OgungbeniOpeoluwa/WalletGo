@@ -22,10 +22,12 @@ var (
 
 func Load(path string) {
 	err := godotenv.Load(path)
+	log.Println(err)
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 	mapConfiguration()
+
 }
 
 func mapConfiguration() {
@@ -36,11 +38,14 @@ func mapConfiguration() {
 }
 
 func mapDatabaseConfiguration() {
+	log.Println("am here")
 	DatabaseUsername = os.Getenv("DB_USERNAME")
 	DatabasePassword = os.Getenv("DB_PASSWORD")
 	DatabaseHost = os.Getenv("DB_HOST")
 	DatabasePort = os.Getenv("DB_PORT")
 	DatabaseName = os.Getenv("DB_NAME")
+	log.Println(DatabaseUsername)
+	log.Println(os.Getenv("DB_NAME"))
 
 }
 

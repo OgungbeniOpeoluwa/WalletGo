@@ -16,6 +16,7 @@ func TestCreateAccount(t *testing.T) {
 		LastName:    "shola",
 		Email:       "ope@gmail.com",
 		PhoneNumber: "07066221008",
+		Password:    "ope@1",
 	}
 	account := services.NewWalletServiceImpl()
 	accountNumber, err := account.CreateAccount(createAccount)
@@ -31,6 +32,7 @@ func TestThatAmountLesserThan10CantBeTransfer(t *testing.T) {
 		LastName:    "shola",
 		Email:       "ope@gmail.com",
 		PhoneNumber: "07066221098",
+		Password:    "ope@1",
 	}
 	account := services.NewWalletServiceImpl()
 	_, err := account.CreateAccount(createAccount)
@@ -80,6 +82,7 @@ func TestAfterTransactionIsCreated(t *testing.T) {
 		LastName:    "shola",
 		Email:       "ope3@gmail.com",
 		PhoneNumber: "07063620998",
+		Password:    "ope@1",
 	}
 	account := services.NewWalletServiceImpl()
 	_, err := account.CreateAccount(createAccount)
@@ -104,5 +107,17 @@ func TestAfterTransactionIsCreated(t *testing.T) {
 		return
 	}
 	assert.Equal(t, len(transaction), 1)
+
+}
+
+func TestGetAccountBalance(t *testing.T) {
+	config.Load("../.env")
+	account := services.NewWalletServiceImpl()
+	accountBalance, err := account.GetBalance("07063620998")
+	if err != nil {
+		t.Errorf("expected nil but got %v", err)
+		return
+	}
+	assert.Equal(t, float64(0), *accountBalance)
 
 }

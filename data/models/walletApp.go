@@ -10,4 +10,5 @@ type Wallet struct {
 	Pin           string
 	Balance       float64
 	UserId        uint
+	Password      string
 }

@@ -19,3 +19,18 @@ func SendBadRequestError(c *gin.Context, req any) {
 	}
 	c.JSON(http.StatusBadRequest, data)
 }
+
+func SendUnprocessableEntity(c *gin.Context, req any) {
+	data := map[string]any{
+		"message": "Unable to process request",
+		"Data":    []any{req},
+	}
+	c.JSON(http.StatusUnprocessableEntity, data)
+}
+func SendSuccess(c *gin.Context, req any) {
+	data := map[string]any{
+		"message": "success",
+		"Data":    []any{req},
+	}
+	c.JSON(http.StatusOK, data)
+}

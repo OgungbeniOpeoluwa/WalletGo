@@ -6,7 +6,7 @@ import (
 )
 
 func ErrorLogger(err error) {
-	logger, errs := os.OpenFile("../errorlogs/error",
+	logger, errs := os.OpenFile("C:\\Users\\Dell\\GolandProjects\\WalletService\\errorlogs\\error",
 		os.O_RDWR|os.O_APPEND|os.O_WRONLY, 0666)
 	if errs != nil {
 		log.Println(errs)
