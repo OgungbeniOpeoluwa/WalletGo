@@ -3,24 +3,24 @@ package controlers
 import (
 	"WalletService/dtos/request"
 	"WalletService/dtos/response"
+	"WalletService/services"
 	"WalletService/util"
-	"WalletService/util/httpRequest"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 )
 
 type PaymentServiceController struct {
-	//c *gin.Context
+	walletService services.WalletService
 }
 
 func NewPaymentServiceController() *PaymentServiceController {
 
-	return &PaymentServiceController{}
+	return &PaymentServiceController{walletService: services.NewWalletServiceImpl()}
 }
 
 func (p *PaymentServiceController) MonifyWebhook(c *gin.Context) {
-	log.Println("am here: ", c.Request)
+	log.Println("am here: ", c.Request.Body)
 	req := request.MonnifyWebhookRequest{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
@@ -28,16 +28,26 @@ func (p *PaymentServiceController) MonifyWebhook(c *gin.Context) {
 		response.SendBadRequestError(c, util.ErrMakingPostRequest)
 		return
 	}
-	log.Println(req)
-	res, err := httpRequest.DecodeRequestBody[request.MonnifyWebhookRequest](c.Request.Body, request.MonnifyWebhookRequest{})
-	//if res.EventData.PaymentStatus == "SUCCESSFUL_TRANSACTION" {
-	//
-	//}
+	go func() {
+		p.walletService.UpdateTransaction(req.EventData.PaymentReference, req.EventType)
+	}()
+
+	c.JSON(http.StatusOK, map[string]any{"status": true})
+
+}
+
+func (p *PaymentServiceController) PaystackWebooks(c *gin.Context) {
+	req := request.PaystackWebhook{}
+	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		response.SendBadRequestError(c, util.ErrMakingPostRequest)
+		response.SendBadRequestError(c, err)
 		return
 	}
-	log.Println(res)
-	c.JSON(http.StatusOK, map[string]any{"status": true})
+	log.Println(req)
+	go func() {
+		p.walletService.UpdateTransaction(req.Data.Reference, req.Event)
+
+	}()
+	response.SendSuccess(c, "successful")
 
 }

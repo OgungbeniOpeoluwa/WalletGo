@@ -6,7 +6,8 @@ import (
 )
 
 func Routes(router *gin.Engine) {
-	router.POST("/webhook", controlers.NewPaymentServiceController().MonifyWebhook)
+	router.POST("/monify/webhook", controlers.NewPaymentServiceController().MonifyWebhook)
+	router.POST("/paystack/webhook", controlers.NewPaymentServiceController().PaystackWebooks)
 	walletGroup := router.Group("/api/v1/wallet")
 	walletGroup.POST("/create", controlers.NewWalletController().CreateAccount)
 	walletGroup.POST("/initialize-transaction", controlers.NewWalletController().InitializeTransactions)

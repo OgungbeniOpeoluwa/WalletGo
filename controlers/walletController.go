@@ -22,7 +22,7 @@ func (C *WalletController) CreateAccount(c *gin.Context) {
 		response.SendBadRequestError(c, err.Error())
 		return
 	}
-	account, err := C.walletService.CreateAccount(req)
+	account, err := C.walletService.CreateAccount(&req)
 	if err != nil {
 		response.SendUnprocessableEntity(c, err.Error())
 		return
@@ -38,7 +38,7 @@ func (C *WalletController) InitializeTransactions(c *gin.Context) {
 		response.SendBadRequestError(c, err.Error())
 		return
 	}
-	account, err := C.walletService.InitializeTransaction(req)
+	account, err := C.walletService.InitializeTransaction(&req)
 	if err != nil {
 		response.SendUnprocessableEntity(c, err.Error())
 		return

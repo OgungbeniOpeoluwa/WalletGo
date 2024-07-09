@@ -19,7 +19,7 @@ func TestCreateAccount(t *testing.T) {
 		Password:    "ope@1",
 	}
 	account := services.NewWalletServiceImpl()
-	accountNumber, err := account.CreateAccount(createAccount)
+	accountNumber, err := account.CreateAccount(&createAccount)
 	if err != nil {
 		t.Errorf("expected %v but got %v", err, accountNumber)
 	}
@@ -35,8 +35,8 @@ func TestThatAmountLesserThan10CantBeTransfer(t *testing.T) {
 		Password:    "ope@1",
 	}
 	account := services.NewWalletServiceImpl()
-	_, err := account.CreateAccount(createAccount)
-	_, err = account.InitializeTransaction(request.FundWalletRequest{
+	_, err := account.CreateAccount(&createAccount)
+	_, err = account.InitializeTransaction(&request.FundWalletRequest{
 		AccountNumber: "07066221098",
 		Amount:        5,
 		PaymentMeans:  "paystack",
@@ -56,12 +56,12 @@ func TestInitializeTransaction(t *testing.T) {
 		PhoneNumber: "07063620998",
 	}
 	account := services.NewWalletServiceImpl()
-	_, err := account.CreateAccount(createAccount)
+	_, err := account.CreateAccount(&createAccount)
 	if err != nil {
 		t.Errorf("expected %v but got %v", nil, err)
 		return
 	}
-	fund, err := account.InitializeTransaction(request.FundWalletRequest{
+	fund, err := account.InitializeTransaction(&request.FundWalletRequest{
 		AccountNumber: "07063620998",
 		Amount:        1000,
 		PaymentMeans:  "paystack",
@@ -85,12 +85,12 @@ func TestAfterTransactionIsCreated(t *testing.T) {
 		Password:    "ope@1",
 	}
 	account := services.NewWalletServiceImpl()
-	_, err := account.CreateAccount(createAccount)
+	_, err := account.CreateAccount(&createAccount)
 	if err != nil {
 		t.Errorf("expected %v but got %v", nil, err)
 		return
 	}
-	result, err := account.InitializeTransaction(request.FundWalletRequest{
+	result, err := account.InitializeTransaction(&request.FundWalletRequest{
 		AccountNumber: "07063620998",
 		Amount:        1000,
 		PaymentMeans:  "paystack",

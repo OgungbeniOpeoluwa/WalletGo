@@ -1,12 +1,10 @@
 package request
 
-import "github.com/google/uuid"
-
 type UpdateTransactionStatusRequest struct {
-	Status string    `json:"status"`
-	Id     uuid.UUID `json:"id"`
+	Status string `json:"status"`
+	Id     string `json:"id"`
 }
 
-func NewUpdateTransactionStatusRequest(status string, id uuid.UUID) *UpdateTransactionStatusRequest {
+func NewUpdateTransactionStatusRequest(status string, id string) *UpdateTransactionStatusRequest {
 	return &UpdateTransactionStatusRequest{Status: status, Id: id}
 }

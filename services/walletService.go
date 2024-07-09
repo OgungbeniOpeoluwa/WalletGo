@@ -5,16 +5,18 @@ import (
 	"WalletService/data/repositories"
 	"WalletService/dtos/request"
 	"WalletService/dtos/response"
+	"WalletService/logger"
 	"WalletService/services/paymentService"
 	"WalletService/util"
 	"fmt"
 )
 
 type WalletService interface {
-	CreateAccount(req request.CreateAccountRequest) (string, error)
-	InitializeTransaction(req request.FundWalletRequest) (*response.FundWalletResponse, error)
+	CreateAccount(req *request.CreateAccountRequest) (string, error)
+	InitializeTransaction(req *request.FundWalletRequest) (*response.FundWalletResponse, error)
 	GetAllTransactions(accountNumber string) ([]*response.TransactionResponse, error)
 	GetBalance(accountNumber string) (*float64, error)
+	UpdateTransaction(reference, status string)
 }
 
 type WalletServiceImpl struct {
@@ -31,7 +33,7 @@ func NewWalletServiceImpl() *WalletServiceImpl {
 	}
 }
 
-func (receiver *WalletServiceImpl) CreateAccount(req request.CreateAccountRequest) (string, error) {
+func (receiver *WalletServiceImpl) CreateAccount(req *request.CreateAccountRequest) (string, error) {
 	user := request.CreateUserRequest{
 		LastName:    req.LastName,
 		FirstName:   req.FirstName,
@@ -56,7 +58,7 @@ func (receiver *WalletServiceImpl) CreateAccount(req request.CreateAccountReques
 
 }
 
-func (receiver *WalletServiceImpl) InitializeTransaction(req request.FundWalletRequest) (*response.FundWalletResponse, error) {
+func (receiver *WalletServiceImpl) InitializeTransaction(req *request.FundWalletRequest) (*response.FundWalletResponse, error) {
 	var user *models.User
 	user, err := receiver.userService.GetUserByPhoneNumber(req.AccountNumber)
 	wallet, err := receiver.repository.GetBy("user_id", user.ID)
@@ -64,7 +66,7 @@ func (receiver *WalletServiceImpl) InitializeTransaction(req request.FundWalletR
 		err = util.ErrFetching
 		return nil, err
 	}
-	transaction, err2 := mapCreateTransactionName(req, wallet, receiver)
+	transaction, err2 := mapCreateTransactionName(*req, wallet, receiver)
 
 	if err2 != nil {
 		return nil, err2
@@ -140,9 +142,44 @@ func mapCreateTransactionName(req request.FundWalletRequest, wallet models.Walle
 
 func updateFailedTransaction(receiver *WalletServiceImpl, transaction *models.Transaction) (error, *response.FundWalletResponse, error) {
 	_, err := receiver.transactionService.UpdateTransaction(request.NewUpdateTransactionStatusRequest(
-		util.Failed, transaction.ID))
+		util.Failed, transaction.ID.String()))
 	if err != nil {
 		return nil, nil, err
 	}
 	return err, nil, nil
+}
+
+func (receiver *WalletServiceImpl) UpdateTransaction(reference, status string) {
+	var transaction *models.Transaction
+	var err error
+	if status == "charge.success" || status == "SUCCESSFUL_TRANSACTION" {
+		transaction, err = receiver.transactionService.UpdateTransaction(
+			request.NewUpdateTransactionStatusRequest(util.Successful, reference))
+		if err != nil {
+			logger.ErrorLogger(err)
+			return
+		}
+		err := receiver.updateBalance(transaction.WalletID, transaction.Amount)
+		if err != nil {
+			logger.ErrorLogger(err)
+			return
+		}
+		return
+	}
+	transaction, err = receiver.transactionService.UpdateTransaction(
+		request.NewUpdateTransactionStatusRequest(util.Failed, reference))
+}
+
+func (receiver *WalletServiceImpl) updateBalance(id uint, amount float64) error {
+	wallet, err := receiver.repository.FindById(id)
+	if err != nil {
+		return err
+	}
+	wallet.Balance += amount
+	_, err = receiver.repository.Save(wallet)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }

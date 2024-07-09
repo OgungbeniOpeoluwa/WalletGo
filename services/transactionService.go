@@ -56,7 +56,12 @@ func mapTransaction(req request.CreateTransactionRequest) *models.Transaction {
 	return transaction
 }
 func (receiver *TransactionServiceImpl) UpdateTransaction(req *request.UpdateTransactionStatusRequest) (*models.Transaction, error) {
-	transaction, err := receiver.repository.FindById(req.Id)
+	parseUuid, err := uuid.Parse(req.Id)
+	if err != nil {
+		err = util.ErrInvalidId
+		return nil, err
+	}
+	transaction, err := receiver.repository.FindById(parseUuid)
 	if err != nil {
 		err = util.ErrFetching
 		return nil, err

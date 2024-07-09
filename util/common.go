@@ -8,7 +8,7 @@ const (
 	Debit      = "DEBIT"
 	Credit     = "CREDIT"
 	Pending    = "PENDING"
-	Failed     = "Failed"
-	Successful = "Successful"
+	Failed     = "FAILED"
+	Successful = "SUCCESSFUL"
 	Processing = "PROCESSING"
 )

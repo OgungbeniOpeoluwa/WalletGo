@@ -12,4 +12,5 @@ var (
 	ErrFetching          = errors.New("doesn't exist")
 	ErrAlreadyExit       = errors.New("account already exist")
 	ErrBadRequest        = errors.New("bad request")
+	ErrInvalidId         = errors.New("Invalid id")
 )
