@@ -74,7 +74,7 @@ func TestUpdateTransactionStatusFromPendingToFailed(t *testing.T) {
 	}
 
 	updateTransaction, err := transaction.UpdateTransaction(&request.UpdateTransactionStatusRequest{
-		Id:     returns.ID,
+		Id:     returns.ID.String(),
 		Status: util.Failed,
 	})
 	if err != nil {

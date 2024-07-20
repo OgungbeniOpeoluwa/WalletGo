@@ -6,7 +6,6 @@ import (
 	"WalletService/services"
 	"WalletService/util"
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 )
 
@@ -20,11 +19,9 @@ func NewPaymentServiceController() *PaymentServiceController {
 }
 
 func (p *PaymentServiceController) MonifyWebhook(c *gin.Context) {
-	log.Println("am here: ", c.Request.Body)
 	req := request.MonnifyWebhookRequest{}
 	err := c.ShouldBindJSON(&req)
 	if err != nil {
-		log.Println("err: ", err)
 		response.SendBadRequestError(c, util.ErrMakingPostRequest)
 		return
 	}
@@ -43,7 +40,6 @@ func (p *PaymentServiceController) PaystackWebooks(c *gin.Context) {
 		response.SendBadRequestError(c, err)
 		return
 	}
-	log.Println(req)
 	go func() {
 		p.walletService.UpdateTransaction(req.Data.Reference, req.Event)
 
